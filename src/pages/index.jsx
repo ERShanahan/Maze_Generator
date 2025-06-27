@@ -14,12 +14,14 @@ const WEST  = 8;
 
 const ALGORITHMS = ['dfs', 'eller', 'wilson'];
 
-const MazeCell = memo(function MazeCell({ mask }) {
+const MazeCell = memo(function MazeCell({ mask, isStart, isEnd }) {
   const classes = ['cell'];
   if (mask & NORTH) classes.push('wall-top');
   if (mask & EAST)  classes.push('wall-right');
   if (mask & SOUTH) classes.push('wall-bottom');
   if (mask & WEST)  classes.push('wall-left');
+  if (isStart) classes.push('cell-start');
+  if (isEnd)   classes.push('cell-end');
   return <div className={classes.join(' ')} />;
 });
 
@@ -37,6 +39,8 @@ export default function MazePage() {
   const [steps, setSteps] = useState([]);
   const [maze, setMaze] = useState(createEmptyMaze(DEFAULT_SIZE));
   const [generating, setGenerating] = useState(false);
+  const [startPos, setStartPos]     = useState({ x: 0, y: 0 });
+  const [endPos,   setEndPos]       = useState({ x: 0, y: 0 });
 
   async function fetchMaze() {
     setGenerating(true);
@@ -59,6 +63,8 @@ export default function MazePage() {
       setSteps(newSteps);
       setSize(hiddenSize);
       setMaze(new Uint8Array(newSteps[0]));
+      setStartPos(payload.start);
+      setEndPos(payload.end);
     } catch (e) {
       console.error('Error fetching maze:', e);
     } finally {
@@ -80,6 +86,9 @@ export default function MazePage() {
     }, DELAY);
     return () => clearInterval(interval);
   }, [steps]);
+
+  const startIndex = startPos.y * size + startPos.x;
+  const endIndex   = endPos.y   * size + endPos.x;
 
   return (
     <div className="container">
@@ -115,7 +124,7 @@ export default function MazePage() {
 
         <div className="maze" style={{ '--grid-size': size }}>
           {Array.from({ length: size * size }, (_, idx) => (
-            <MazeCell key={idx} mask={maze[idx]} />
+            <MazeCell key={idx} mask={maze[idx]} isStart={idx === startIndex} isEnd={idx === endIndex} />
           ))}
         </div>
       </div>

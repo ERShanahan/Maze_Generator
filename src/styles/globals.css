@@ -87,6 +87,13 @@ a {
   border-left: 2px solid transparent;
 }
 
+.cell-start {
+  background-color: rgba(0, 200, 0, 0.3);
+}
+.cell-end {
+  background-color: rgba(200, 0, 0, 0.3);
+}
+
 .cell.wall-top {    border-top-color: var(--foreground); }
 .cell.wall-right {  border-right-color: var(--foreground); }
 .cell.wall-bottom { border-bottom-color: var(--foreground); }
