@@ -40,18 +40,35 @@ a {
 .container {
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
-  height: 100vh;
+  justify-content: flex-start;
+  min-height: 100vh;
+  padding: 1rem;
   background: var(--background);
   color: var(--foreground);
+  overflow-y: auto;
 }
 
 .controls {
   display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  flex-direction: column;
   align-items: center;
-  margin-bottom: 1rem;
+  justify-content: center;
+  width: 100%;
+  max-width: 800px;
+  margin: 0.5rem 0;
 }
+
+.gen-algorithm-controls,
+.sol-algorithm-controls,
+.size-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 
 .dimension-title {
   font-size: 1.5rem;
@@ -94,14 +111,22 @@ a {
   background-color: rgba(200, 0, 0, 0.3);
 }
 
+.cell-visited {
+  background-color: rgba(255,255,255,0.4);
+}
+
+.cell-path {
+  background-color: rgba(255,255,255,0.8);
+}
+
 .cell.wall-top {    border-top-color: var(--foreground); }
 .cell.wall-right {  border-right-color: var(--foreground); }
 .cell.wall-bottom { border-bottom-color: var(--foreground); }
 .cell.wall-left {   border-left-color: var(--foreground); }
 
-/* Rework dim-btn & generate-button to use --accent */
 .dim-btn,
-.generate-button {
+.generate-button,
+.solve-button {
   margin: 0 0.25rem;
   padding: 0.5rem;
   font-size: 1rem;
@@ -113,7 +138,8 @@ a {
   transition: opacity 0.2s;
 }
 .dim-btn:disabled,
-.generate-button:disabled {
+.generate-button:disabled,
+.solve-button:disabled {
   background-color: #999;
   cursor: not-allowed;
   opacity: 0.6;

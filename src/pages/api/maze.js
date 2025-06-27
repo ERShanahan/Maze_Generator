@@ -287,7 +287,6 @@ export default function handler(req, res) {
       .status(400)
       .json({ error: "Size must be an integer between 5 and 50." });
   }
-  // Only dfs supported for now
   if (!types.includes(type)) {
     return res
       .status(400)
