@@ -282,7 +282,7 @@ export default function handler(req, res) {
   const n = parseInt(size, 10);
 
   // Validate size
-  if (isNaN(n) || n < 5 || n > 50) {
+  if (isNaN(n) || n < 4 || n > 50) {
     return res
       .status(400)
       .json({ error: "Size must be an integer between 5 and 50." });
