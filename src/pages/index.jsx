@@ -13,7 +13,7 @@ const SOUTH = 4;
 const WEST  = 8;
 
 const GEN_ALGORITHMS = ['dfs', 'eller', 'wilson'];
-const SOL_ALGORITHMS = ['dfs'];
+const SOL_ALGORITHMS = ['dfs', 'astar', 'djikstra'];
 
 const MazeCell = memo(function MazeCell({ mask, isStart, isEnd, isVisited, isPath }) {
   const classes = ['cell'];
@@ -98,7 +98,7 @@ export default function MazePage() {
     setPathIndex(0);
 
     const params = new URLSearchParams({
-      type: 'dfs',
+      type: SOL_ALGORITHMS[solAlgorithm],
       maze:  JSON.stringify(Array.from(maze)),
       start: JSON.stringify([startPos.x, startPos.y]),
       end:   JSON.stringify([endPos.x,   endPos.y  ])

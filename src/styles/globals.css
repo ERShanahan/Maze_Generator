@@ -49,11 +49,14 @@ a {
   overflow-y: auto;
 }
 
+.container > .controls:first-of-type {
+  flex-direction: column;
+}
+
 .controls {
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
   width: 100%;

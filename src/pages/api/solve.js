@@ -3,10 +3,13 @@ const EAST = 2;
 const SOUTH = 4;
 const WEST = 8;
 
-const types = ["dfs"];
+const types = ["dfs", "astar", "djikstra"];
 
 function serialize([x, y]) {
   return `${x},${y}`;
+}
+function deserialize(key) {
+  return key.split(",").map(Number);
 }
 
 function getNeighbors(maze, [x, y]) {
@@ -63,6 +66,121 @@ function solveDFS(maze, start, end) {
   }
 
   // No path found
+  return {};
+}
+
+function heuristic([x1, y1], [x2, y2]) {
+  return Math.abs(x1 - x2) + Math.abs(y1 - y2);
+}
+
+function solveAStar(maze, start, end) {
+  const startKey = serialize(start);
+  const endKey = serialize(end);
+
+  // gScore = cost from start → node
+  const gScore = { [startKey]: 0 };
+  // fScore = gScore + heuristic → node
+  const fScore = { [startKey]: heuristic(start, end) };
+
+  // A simple priority queue: array of keys, sorted by fScore
+  const openSet = new Set([startKey]);
+  const openArr = [startKey];
+
+  const cameFrom = {};
+  const visits = [];
+
+  while (openArr.length) {
+    // pop the node with lowest fScore
+    openArr.sort((a, b) => fScore[a] - fScore[b]);
+    const currentKey = openArr.shift();
+    openSet.delete(currentKey);
+
+    const current = deserialize(currentKey);
+    visits.push(current);
+
+    if (currentKey === endKey) {
+      // reconstruct path
+      const path = [];
+      let k = endKey;
+      while (k) {
+        path.push(deserialize(k));
+        if (k === startKey) break;
+        k = cameFrom[k];
+      }
+      return { path: path.reverse(), visits };
+    }
+
+    for (const nbr of getNeighbors(maze, current)) {
+      const nbrKey = serialize(nbr);
+      const tentativeG = gScore[currentKey] + 1;
+
+      if (tentativeG < (gScore[nbrKey] ?? Infinity)) {
+        cameFrom[nbrKey] = currentKey;
+        gScore[nbrKey] = tentativeG;
+        fScore[nbrKey] = tentativeG + heuristic(nbr, end);
+
+        if (!openSet.has(nbrKey)) {
+          openSet.add(nbrKey);
+          openArr.push(nbrKey);
+        }
+      }
+    }
+  }
+
+  // no path found
+  return {};
+}
+
+function solveDijkstra(maze, start, end) {
+  const startKey = serialize(start);
+  const endKey = serialize(end);
+
+  // dist = cost from start → node
+  const dist = { [startKey]: 0 };
+
+  const openSet = new Set([startKey]);
+  const openArr = [startKey];
+
+  const cameFrom = {};
+  const visits = [];
+
+  while (openArr.length) {
+    // pick node with smallest dist[]
+    openArr.sort((a, b) => dist[a] - dist[b]);
+    const currentKey = openArr.shift();
+    openSet.delete(currentKey);
+
+    const current = deserialize(currentKey);
+    visits.push(current);
+
+    if (currentKey === endKey) {
+      // reconstruct path
+      const path = [];
+      let k = endKey;
+      while (k) {
+        path.push(deserialize(k));
+        if (k === startKey) break;
+        k = cameFrom[k];
+      }
+      return { path: path.reverse(), visits };
+    }
+
+    for (const nbr of getNeighbors(maze, current)) {
+      const nbrKey = serialize(nbr);
+      const tentativeDist = dist[currentKey] + 1;
+
+      if (tentativeDist < (dist[nbrKey] ?? Infinity)) {
+        cameFrom[nbrKey] = currentKey;
+        dist[nbrKey] = tentativeDist;
+
+        if (!openSet.has(nbrKey)) {
+          openSet.add(nbrKey);
+          openArr.push(nbrKey);
+        }
+      }
+    }
+  }
+
   return {};
 }
 
@@ -129,6 +247,10 @@ export default function handler(req, res) {
   let solution = {};
   if (type === "dfs") {
     solution = solveDFS(mazeArr, startCoord, endCoord);
+  } else if (type === "astar") {
+    solution = solveAStar(mazeArr, startCoord, endCoord);
+  } else if (type === "djikstra") {
+    solution = solveDijkstra(mazeArr, startCoord, endCoord);
   }
 
   return res.status(200).json({
